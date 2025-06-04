@@ -5,7 +5,7 @@ using static Item;
 public partial class GroundItem : Node3D
 {
 	[Export]
-	public string Name = "Scientist Card";
+	public string Name = "Scientist_Card";
 	
 	[Export]
 	public string SysName = "uchenicard";

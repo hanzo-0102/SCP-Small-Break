@@ -10,8 +10,8 @@ public class Requirements
 		cards = new Dictionary<string, int>
 		{
 			{ "", 0 },
-			{ "Scientist Card", 3 },
-			{ "05 Card", 5 }
+			{ "Scientist_Card", 3 },
+			{ "05_Card", 5 }
 		};
 	}
 	

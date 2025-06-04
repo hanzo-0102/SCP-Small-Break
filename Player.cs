@@ -81,11 +81,17 @@ public partial  class Player : CharacterBody3D
 		
 		_raycast = new RayCast3D();
 		_raycast.TargetPosition = new Vector3(0.0f, -5.0f, 0.0f);
-		_raycast.Rotation = new Vector3(90.0f, 0.0f, 0.0f);
+		_raycast.Rotation = new Vector3(89.54f, 0.0f, 0.0f);
 		_raycast.Name = "RayCast3D";
 		_raycast.CollideWithAreas = true;
 		_raycast.AddException(this);
 		_camera.AddChild(_raycast);
+		
+		/*MeshInstance3D cube = new MeshInstance3D();
+		cube.Mesh = new BoxMesh();
+		cube.Position = new Vector3(0.0f, -5.0f, 0.0f);
+		cube.Scale = new Vector3(.1f, .1f, .1f);
+		_raycast.AddChild(cube);*/
 		
 		PlayerGUILive _guishka = GUIshka.Instantiate<PlayerGUILive>();
 		_guishka.Name = "Control";

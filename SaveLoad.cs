@@ -13,14 +13,6 @@ public partial class SaveLoad : Node
 	{
 		LoadGameData();
 	}
-	
-	public override void _Process(double delta) {
-		Player player = GetNode<Player>("Player");
-		
-		if (!player.Init) {
-			player._Ready();
-		}
-	}
 
 	private async void LoadGameData()
 	{
@@ -43,6 +35,7 @@ public partial class SaveLoad : Node
 				Item[] newinventory = { new Item(), new Item(), new Item() };
 				for (int i = 0; i != 3; i++)
 				{
+					GD.Print(textFromFile[i + 1]);
 					newinventory[i] = new Item(
 						textFromFile[i + 1].Split()[0],
 						textFromFile[i + 1].Split()[1],
@@ -82,14 +75,15 @@ public partial class SaveLoad : Node
 				string output = "";
 				// Save player position
 				output += this.GetNode<CharacterBody3D>("Player").Position.ToString() + "\n";
-
+				
+				
 				// Save inventory items
 				Player player = this.GetNode<Player>("Player");
-				foreach (var item in player.inventory)
+				for (int i = 0; i != 3; i++)
 				{
-					output += item.ToString() + "\n";
+					output += player.inventory[i].ToString() + "\n";
 				}
-
+				
 				// Write to file
 				byte[] positionBuffer = Encoding.Default.GetBytes(output);
 				await fstream.WriteAsync(positionBuffer, 0, positionBuffer.Length);
