@@ -14,6 +14,9 @@ public partial  class Player : CharacterBody3D
 	public PackedScene ThrowItem = GD.Load<PackedScene>("res://ground_item.tscn");
 	
 	[Export]
+	public PackedScene GUIshka = GD.Load<PackedScene>("res://GUI.tscn");
+	
+	[Export]
 	public int Speed { get; set; } = 14;
 	[Export]
 	public int FallAcceleration { get; set; } = 75;
@@ -23,6 +26,9 @@ public partial  class Player : CharacterBody3D
 	public bool Jumped = false;
 	public float MouseSensitivity = 0.0002f;
 	public float MaxAngle = 90f;
+	
+	private bool _initialized = true;
+	public bool Init => _initialized;
 	
 	private Node scene;
 	
@@ -56,40 +62,58 @@ public partial  class Player : CharacterBody3D
 	}
 	
 	public Player(Vector3 pos, Item[] inventory) {
+		
 		CollisionShape3D collider = new CollisionShape3D();
 		collider.Shape = new CapsuleShape3D();
 		AddChild(collider);
-		Camera3D camera = new Camera3D();
-		camera.Position = new Vector3(0.0f, 1.135f, 0.0f);
-		AddChild(camera);
-		SpotLight3D fonar = new SpotLight3D();
-		fonar.SpotRange = 200.0f;
-		fonar.SpotAngle = 40.0f;
-		fonar.LightEnergy = 6.0f;
-		camera.AddChild(fonar);
-		RayCast3D raycast = new RayCast3D();
-		raycast.TargetPosition = new Vector3(0.0f, -3.0f, 0.0f);
-		raycast.Rotation = new Vector3(90.0f, 0.0f, 0.0f);
-		camera.AddChild(raycast);
-		PlayerGUILive gui = new PlayerGUILive();
-		camera.AddChild(gui);
-		RayCast3D shooting = new RayCast3D();
-		shooting.TargetPosition = new Vector3(0.0f, -30.0f, 0.0f);
-		shooting.Rotation = new Vector3(90.0f, 0.0f, 0.0f);
-		shooting.Name = "ShootingRange";
-		camera.AddChild(shooting);
-		MeshInstance3D helditem = new MeshInstance3D();
-		helditem.Position = new Vector3(0.489f, -0.343f, -0.631f);
-		helditem.Rotation = new Vector3(-34.6f, 98.5f, 43.8f);
-		helditem.Scale = new Vector3(0.1f, 0.1f, 0.1f);
-		helditem.Name = "HeldItem";
-		camera.AddChild(helditem);
+		
+		_camera = new Camera3D();
+		_camera.Position = new Vector3(0.0f, 1.135f, 0.0f);
+		_camera.Name = "Camera3D";
+		AddChild(_camera);
+		
+		_flashlight = new SpotLight3D();
+		_flashlight.SpotRange = 200.0f;
+		_flashlight.SpotAngle = 40.0f;
+		_flashlight.LightEnergy = 6.0f;
+		_flashlight.Name = "SpotLight3D";
+		_camera.AddChild(_flashlight);
+		
+		_raycast = new RayCast3D();
+		_raycast.TargetPosition = new Vector3(0.0f, -5.0f, 0.0f);
+		_raycast.Rotation = new Vector3(90.0f, 0.0f, 0.0f);
+		_raycast.Name = "RayCast3D";
+		_raycast.CollideWithAreas = true;
+		_raycast.AddException(this);
+		_camera.AddChild(_raycast);
+		
+		PlayerGUILive _guishka = GUIshka.Instantiate<PlayerGUILive>();
+		_guishka.Name = "Control";
+		_camera.AddChild(_guishka);
+		
+		_shooting = new RayCast3D();
+		_shooting.TargetPosition = new Vector3(0.0f, -30.0f, 0.0f);
+		_shooting.Rotation = new Vector3(90.0f, 0.0f, 0.0f);
+		_shooting.Name = "ShootingRange";
+		_camera.AddChild(_shooting);
+		
+		MeshInstance3D _held_item = new MeshInstance3D();
+		_held_item.Position = new Vector3(0.489f, -0.343f, -0.631f);
+		_held_item.Rotation = new Vector3(-34.6f, 98.5f, 43.8f);
+		_held_item.Scale = new Vector3(0.1f, 0.1f, 0.1f);
+		_held_item.Name = "HeldItem";
+		_camera.AddChild(_held_item);
+		
 		MeshInstance3D model = new MeshInstance3D();
 		model.Mesh = new CapsuleMesh();
 		model.Scale = new Vector3(0.9f, 1.8f, 0.9f);
 		AddChild(model);
+		
 		this.Position = pos;
 		this.inventory = inventory;
+		
+		Input.MouseMode = Input.MouseModeEnum.Captured;
+		AddToGroup("players");
 	}
 	
 	public override void _Process(double delta)
@@ -162,6 +186,7 @@ public partial  class Player : CharacterBody3D
 				} catch {
 				}
 				try {
+					GD.Print(((Node3D)_raycast.GetCollider()).Name);
 					Area3D obj = (Area3D)_raycast.GetCollider();
 					GroundItem cr = (GroundItem)obj.GetParentNode3D();
 					Array.Resize(ref inventory, inventory.Length + 1);

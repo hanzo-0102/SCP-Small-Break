@@ -13,6 +13,14 @@ public partial class SaveLoad : Node
 	{
 		LoadGameData();
 	}
+	
+	public override void _Process(double delta) {
+		Player player = GetNode<Player>("Player");
+		
+		if (!player.Init) {
+			player._Ready();
+		}
+	}
 
 	private async void LoadGameData()
 	{
@@ -45,9 +53,9 @@ public partial class SaveLoad : Node
 				}
 				Player player = new Player(newpos, newinventory);
 				player.Name = "Player";
+				player.Scale = new Vector3(1.3f, 1.3f, 1.3f);
 				AddChild(player);
 				GD.Print(player.Position + " " + player.Scale);
-				GD.Print($"Текст из файла: {textFromFile}");
 			}
 		}
 		catch (Exception ex)
